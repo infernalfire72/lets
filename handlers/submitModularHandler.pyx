@@ -32,7 +32,6 @@ from objects import relaxboard
 from objects import rxscore
 from common import generalUtils
 
-
 MODULE_NAME = "submit_modular"
 class handler(requestsManager.asyncRequestHandler):
 	"""
@@ -82,6 +81,7 @@ class handler(requestsManager.asyncRequestHandler):
 			# Get score data
 			log.debug("Decrypting score data...")
 			scoreData = aeshelper.decryptRinjdael(aeskey, iv, scoreDataEnc, True).split(":")
+
 			username = scoreData[1].strip()
 
 			# Login and ban check
