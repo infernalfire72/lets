@@ -223,6 +223,14 @@ class handler(requestsManager.asyncRequestHandler):
 				userUtils.ban(userID)
 				userUtils.appendNotes(userID, "Banned due to negative score.")
 
+			if (s.score - (s.c300 * 300 + s.c100 * 100 + s.c50 * 50)) < 0:
+				#userUtils.ban(userID)
+				#userUtils.appendNotes(userID, "Banned due to score being less than no-combo value.")
+				log.cmyui("{} has submitted a score where score is less than no-combo value.".format(userID), discord="cm")
+
+			if s.fullCombo and s.cmiss > 1:
+				log.cmyui("{} has submitted a score with 'fullCombo' flag, but has > 0 misses.".format(userID), discord="cm")
+
 			# Make sure the score is not memed
 			if s.gameMode == gameModes.MANIA and s.score > 1000000:
 				userUtils.ban(userID)
@@ -370,17 +378,17 @@ class handler(requestsManager.asyncRequestHandler):
 			# Score has been submitted, do not retry sending the score if
 			# there are exceptions while building the ranking panel
 			keepSending = False
-			
+
 			# At the end, check achievements
 			if s.passed:
 				new_achievements = secret.achievements.utils.unlock_achievements(s, beatmapInfo, newUserData)
-			
+
 			# Output ranking panel only if we passed the song
 			# and we got valid beatmap info from db
 			if beatmapInfo is not None and beatmapInfo != False and s.passed:
 				log.debug("Started building ranking panel.")
 
-				
+
 				if isRelaxing: # Relax
 					# Trigger bancho stats cache update
 					glob.redis.publish("peppy:update_rxcached_stats", userID)
