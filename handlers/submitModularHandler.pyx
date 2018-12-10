@@ -229,7 +229,7 @@ class handler(requestsManager.asyncRequestHandler):
 					#userUtils.appendNotes(userID, "Banned due to score being less than no-combo value.")
 					log.cmyui("{} has submitted a score where score is less than no-combo value. (scoreID: {}, score: {}, pp:{})".format(username, s.scoreID, s.score, s.pp), discord="cm")
 
-				if s.fullCombo and s.cmiss > 0:
+				if s.fullCombo and s.cMiss > 0:
 					log.cmyui("{} has submitted a score with 'fullCombo' flag, but has > 0 misses. (scoreID: {}, score: {}, pp:{})".format(username, s.scoreID, s.score, s.pp), discord="cm")
 
 			# Make sure the score is not memed
