@@ -29,7 +29,6 @@ class scoreboard:
 		if setScores:
 			self.setScores()
 
-
 	def setScores(self):
 		"""
 		Set scores list

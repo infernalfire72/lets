@@ -71,7 +71,11 @@ class scoreboard:
 				friends = ""
 
 			# Sort and limit at the end
-			order = "ORDER BY pp DESC"
+			if self.beatmap.rankedStatus == rankedStatuses.LOVED:
+				order = "ORDER BY score DESC"
+			else:
+				order = "ORDER BY pp DESC"
+
 			limit = "LIMIT 1"
 
 			# Build query, get params and run query
@@ -116,7 +120,10 @@ class scoreboard:
 		else:
 			friends = ""
 
-		order = "ORDER BY pp DESC"
+		if self.beatmap.rankedStatus == rankedStatuses.LOVED:
+			order = "ORDER BY score DESC"
+		else:
+			order = "ORDER BY pp DESC"
 
 		if isPremium: # Premium members can see up to 100 scores on leaderboards
 			limit = "LIMIT 100"
@@ -199,9 +206,9 @@ class scoreboard:
 
 		# We have a score, run the huge query
 		# Base query
-		query = """SELECT COUNT(*) AS rank FROM scores_relax STRAIGHT_JOIN users ON scores_relax.userid = users.id STRAIGHT_JOIN users_stats ON users.id = users_stats.id WHERE scores_relax.pp >= (
-		SELECT pp FROM scores_relax WHERE beatmap_md5 = %(md5)s AND play_mode = %(mode)s AND completed = 3 AND userid = %(userid)s LIMIT 1
-		) AND scores_relax.beatmap_md5 = %(md5)s AND scores_relax.play_mode = %(mode)s AND scores_relax.completed = 3 AND users.privileges & 1 > 0"""
+		query = """SELECT COUNT(*) AS rank FROM scores_relax STRAIGHT_JOIN users ON scores_relax.userid = users.id STRAIGHT_JOIN users_stats ON users.id = users_stats.id WHERE scores_relax.{PPorScore} >= (
+		SELECT {PPorScore} FROM scores_relax WHERE beatmap_md5 = %(md5)s AND play_mode = %(mode)s AND completed = 3 AND userid = %(userid)s LIMIT 1
+		) AND scores_relax.beatmap_md5 = %(md5)s AND scores_relax.play_mode = %(mode)s AND scores_relax.completed = 3 AND users.privileges & 1 > 0""".format(PPorScore="score" if self.beatmap.rankedStatus == rankedStatuses.LOVED else "pp")
 		# Country
 		if self.country:
 			query += " AND users_stats.country = (SELECT country FROM users_stats WHERE id = %(userid)s LIMIT 1)"
@@ -212,7 +219,12 @@ class scoreboard:
 		if self.friends:
 			query += " AND (scores_relax.userid IN (SELECT user2 FROM users_relationships WHERE user1 = %(userid)s) OR scores_relax.userid = %(userid)s)"
 		# Sort and limit at the end
-		query += " ORDER BY pp DESC LIMIT 1"
+
+		if self.beatmap.rankedStatus == rankedStatuses.LOVED:
+			query += " ORDER BY score DESC LIMIT 1"
+		else:
+			query += " ORDER BY pp DESC LIMIT 1"
+
 		result = glob.db.fetch(query, {"md5": self.beatmap.fileMD5, "userid": self.userID, "mode": self.gameMode, "mods": self.mods})
 		if result is not None:
 			self.personalBestRank = result["rank"]
@@ -237,5 +249,5 @@ class scoreboard:
 
 		# Output top 50 scores
 		for i in self.scores[1:]:
-			data += i.getData(pp=1)
+			data += i.getData(pp=self.beatmap.rankedStatus != rankedStatuses.LOVED)
 		return data

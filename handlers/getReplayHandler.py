@@ -60,7 +60,6 @@ class handler(requestsManager.asyncRequestHandler):
 					if username != replayData["uname"]:
 						userUtils.incrementReplaysWatched(replayData["userid"], replayData["play_mode"], s.mods)
 
-
 			log.info("Serving replay_{}.osr".format(replayID))
 			fileName = ".data/replays/replay_{}.osr".format(replayID)
 			if os.path.isfile(fileName):

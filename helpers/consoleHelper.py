@@ -23,7 +23,7 @@ def printServerStartHeader(asciiArt):
 
 	printColored("> Welcome to the Latest Essential Tatoe Server v{}".format(glob.VERSION), bcolors.GREEN)
 	printColored("> Made by the Ripple and Akatsuki teams", bcolors.GREEN)
-	printColored("> {}https://github.com/cmyui/lets".format(bcolors.UNDERLINE), bcolors.GREEN)
+	printColored("> {}https://github.com/osuAkatsuki/lets".format(bcolors.UNDERLINE), bcolors.GREEN)
 	printColored("> Press CTRL+C to exit\n", bcolors.GREEN)
 
 
