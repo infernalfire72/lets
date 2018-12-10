@@ -223,13 +223,14 @@ class handler(requestsManager.asyncRequestHandler):
 				userUtils.ban(userID)
 				userUtils.appendNotes(userID, "Banned due to negative score.")
 
-			if (s.score - (s.c300 * 300 + s.c100 * 100 + s.c50 * 50)) < 0 and not isRelaxing:
-				#userUtils.ban(userID)
-				#userUtils.appendNotes(userID, "Banned due to score being less than no-combo value.")
-				log.cmyui("{} has submitted a score where score is less than no-combo value. (scoreID: {}, score: {}, pp:{})".format(username, s.scoreID, s.score, s.pp), discord="cm")
+			if s.passed: # just incase :)!
+				if (s.score - (s.c300 * 300 + s.c100 * 100 + s.c50 * 50)) < 0 and not isRelaxing:
+					#userUtils.ban(userID)
+					#userUtils.appendNotes(userID, "Banned due to score being less than no-combo value.")
+					log.cmyui("{} has submitted a score where score is less than no-combo value. (scoreID: {}, score: {}, pp:{})".format(username, s.scoreID, s.score, s.pp), discord="cm")
 
-			if s.fullCombo and s.cmiss > 0:
-				log.cmyui("{} has submitted a score with 'fullCombo' flag, but has > 0 misses. (scoreID: {}, score: {}, pp:{})".format(username, s.scoreID, s.score, s.pp), discord="cm")
+				if s.fullCombo and s.cmiss > 0:
+					log.cmyui("{} has submitted a score with 'fullCombo' flag, but has > 0 misses. (scoreID: {}, score: {}, pp:{})".format(username, s.scoreID, s.score, s.pp), discord="cm")
 
 			# Make sure the score is not memed
 			if s.gameMode == gameModes.MANIA and s.score > 1000000:
