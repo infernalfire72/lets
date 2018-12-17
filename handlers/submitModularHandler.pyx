@@ -465,7 +465,7 @@ class handler(requestsManager.asyncRequestHandler):
 					params = urlencode({"k": glob.conf.config["server"]["apikey"], "to": "#announce", "msg": annmsg})
 					requests.get("{}/api/v1/fokabotMessage?{}".format(glob.conf.config["server"]["banchourl"], params))
 
-					scoreUtils.newFirst(userID, s.scoreID, s.fileMd5, s.gameMode, isRelaxing)
+					scoreUtils.newFirst(s.scoreID, userID, s.fileMd5, s.gameMode, isRelaxing)
 
 				# Write message to client
 				self.write(msg)
