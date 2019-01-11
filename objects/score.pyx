@@ -181,7 +181,7 @@ class score:
 			self.playDateTime = int(time.time())
 			self.calculateAccuracy()
 			#osuVersion = scoreData[17]
-
+			self.calculatePP()
 			# Set completed status
 			self.setCompletedStatus()
 
@@ -241,7 +241,7 @@ class score:
 					self.rankedScoreIncrease = 0
 					self.oldPersonalBest = 0
 
-		log.debug("Completed status: {}".format(self.completed))
+		log.info("Completed status: {}".format(self.completed))
 
 	def saveScoreInDB(self):
 		"""
