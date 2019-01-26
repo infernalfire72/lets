@@ -102,6 +102,8 @@ class piano:
 			multiplier = 1.1
 			if scoreMods & mods.NOFAIL != 0:
 				multiplier *= 0.90
+			if scoreMods & mods.DOUBLETIME != 0:
+				multiplier *= 1.75
 			if scoreMods & mods.SPUNOUT != 0:
 				multiplier *= 0.95
 			if scoreMods & mods.EASY != 0:
