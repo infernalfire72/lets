@@ -427,7 +427,7 @@ class handler(requestsManager.asyncRequestHandler):
 					# Get rank info (current rank, pp/score to next rank, user who is 1 rank above us)
 					rankInfo = leaderboardHelper.getRankInfo(userID, s.gameMode)
 
-				if newCharts:
+			if newCharts:
 					log.debug("Using new charts")
 					dicts = [
 						collections.OrderedDict([
@@ -446,7 +446,7 @@ class handler(requestsManager.asyncRequestHandler):
 							userID, oldUserData, newUserData, beatmapInfo, s, new_achievements, oldRank, rankInfo["currentRank"]
 						)
 					]
-				else:
+			else:
 					log.debug("Using old charts")
 					dicts = [
 						collections.OrderedDict([
