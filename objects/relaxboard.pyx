@@ -1,4 +1,4 @@
-from objects import score
+from objects import rxscore
 from common.ripple import userUtils
 from constants import rankedStatuses
 from common.constants import mods as modsEnum
@@ -92,7 +92,7 @@ class scoreboard:
 		isPremium = userUtils.getPrivileges(self.userID) & privileges.USER_PREMIUM
 		# Output our personal best if found
 		if personalBestScoreID is not None:
-			s = score.score(personalBestScoreID)
+			s = rxscore.score(personalBestScoreID)
 			self.scores[0] = s
 		else:
 			# No personal best
@@ -120,7 +120,10 @@ class scoreboard:
 		else:
 			friends = ""
 		
-		order = "ORDER BY pp DESC"
+		if self.beatmap.rankedStatus == rankedStatuses.LOVED:
+			order = "ORDER BY score DESC"
+		else:
+			order = "ORDER BY pp DESC"
 		
 		if isPremium: # Premium members can see up to 100 scores on leaderboards
 			limit = "LIMIT 100"
@@ -138,7 +141,7 @@ class scoreboard:
 		if topScores is not None:
 			for topScore in topScores:
 				# Create score object
-				s = score.score(topScore["id"], setData=False)
+				s = rxscore.score(topScore["id"], setData=False)
 
 				# Set data and rank from topScores's row
 				s.setDataFromDict(topScore)
