@@ -106,6 +106,10 @@ class piano:
 				multiplier *= 0.95
 			if scoreMods & mods.EASY != 0:
 				multiplier *= 0.50
+			if scoreMods & mods.DOUBLETIME != 0:
+				multiplier *= 2.45
+			if scoreMods & mods.HALFTIME != 0:
+				multiplier *= 0.50
 			pp = pow(pow(strainPP, 1.1) + pow(accPP, 1.1), 1.0 / 1.1) * multiplier
 			log.debug("[WIFIPIANO2] Calculated PP: {}".format(pp))
 
