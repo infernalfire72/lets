@@ -17,15 +17,11 @@ class handler(requestsManager.asyncRequestHandler):
 	def asyncGet(self, replayID):
 		try:
 			fullReplay = replayHelper.buildFullReplay(scoreID=replayID)
-			self.write(fullReplay)
-			self.add_header("Content-type", "application/octet-stream")
-			self.set_header("Content-length", len(fullReplay))
-			self.set_header("Content-Description", "File Transfer")
-			self.set_header("Content-Disposition", "attachment; filename=\"{}.osr\"".format(replayID))
 		except (exceptions.fileNotFoundException, exceptions.scoreNotFoundError):
 			fullReplay = replayHelper.rxbuildFullReplay(scoreID=replayID)
-			self.write(fullReplay)
-			self.add_header("Content-type", "application/octet-stream")
-			self.set_header("Content-length", len(fullReplay))
-			self.set_header("Content-Description", "File Transfer")
-			self.set_header("Content-Disposition", "attachment; filename=\"{}.osr\"".format(replayID))
+
+		self.write(fullReplay)
+		self.add_header("Content-type", "application/octet-stream")
+		self.set_header("Content-length", len(fullReplay))
+		self.set_header("Content-Description", "File Transfer")
+		self.set_header("Content-Disposition", "attachment; filename=\"{}.osr\"".format(replayID))
