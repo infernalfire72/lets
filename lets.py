@@ -24,6 +24,7 @@ from handlers import checkUpdatesHandler
 from handlers import defaultHandler
 from handlers import downloadMapHandler
 from handlers import emptyHandler
+from handlers import rateHandler
 from handlers import getFullReplayHandler
 from handlers import getReplayHandler
 from handlers import getScoresHandler
@@ -52,6 +53,7 @@ def make_app():
 		(r"/web/osu-submit-modular.php", submitModularHandler.handler),
 		(r"/web/osu-submit-modular-selector.php", submitModularHandler.handler),
 		(r"/web/osu-getreplay.php", getReplayHandler.handler),
+		(r"/web/osu-rate.php", rateHandler.handler),
 		(r"/web/osu-screenshot.php", uploadScreenshotHandler.handler),
 		(r"/web/osu-search.php", osuSearchHandler.handler),
 		(r"/web/osu-search-set.php", osuSearchSetHandler.handler),
@@ -77,8 +79,6 @@ def make_app():
 
 		# Not done yet
 		(r"/web/lastfm.php", emptyHandler.handler),
-		(r"/web/osu-rate.php", emptyHandler.handler),
-		(r"/web/osu-comment.php", emptyHandler.handler),
 		(r"/web/osu-checktweets.php", emptyHandler.handler),
 
 		(r"/loadTest", loadTestHandler.handler),
