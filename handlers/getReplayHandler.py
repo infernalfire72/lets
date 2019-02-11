@@ -36,7 +36,11 @@ class handler(requestsManager.asyncRequestHandler):
 			username = self.get_argument("u")
 			password = self.get_argument("h")
 			replayID = self.get_argument("c")
-			s = rxscore.score()
+
+			isRelaxing = False
+			if int(replayID) < 500000000:
+				isRelaxing = True
+
 			# Login check
 			userID = userUtils.getID(username)
 			if userID == 0:
@@ -46,19 +50,11 @@ class handler(requestsManager.asyncRequestHandler):
 			if userUtils.check2FA(userID, ip):
 				raise exceptions.need2FAException(MODULE_NAME, username, ip)
 
-			# Get user ID
-			if bool(s.mods & 128): # Relax
-				replayData = glob.db.fetch("SELECT scores_relax.*, users.username AS uname FROM scores_relax LEFT JOIN users ON scores_relax.userid = users.id WHERE scores_relax.id = %s", [replayID])
-				# Increment 'replays watched by others' if needed
-				if replayData is not None:
-					if username != replayData["uname"]:
-						userUtils.incrementReplaysWatched(replayData["userid"], replayData["play_mode"], s.mods)
-			else:
-				replayData = glob.db.fetch("SELECT scores.*, users.username AS uname FROM scores LEFT JOIN users ON scores.userid = users.id WHERE scores.id = %s", [replayID])
-				# Increment 'replays watched by others' if needed
-				if replayData is not None:
-					if username != replayData["uname"]:
-						userUtils.incrementReplaysWatched(replayData["userid"], replayData["play_mode"], s.mods)
+			replayData = glob.db.fetch("SELECT scores{relax}.*, users.username AS uname FROM scores{relax} LEFT JOIN users ON scores{relax}.userid = users.id WHERE scores{relax}.id = %s".format(relax="_relax" if isRelaxing else ""), [replayID])
+
+			# Increment 'replays watched by others' if needed
+			if replayData is not None:
+				userUtils.incrementReplaysWatched(replayData["userid"], replayData["play_mode"], replayData["mods"])
 
 			log.info("Serving replay_{}.osr".format(replayID))
 			fileName = ".data/replays/replay_{}.osr".format(replayID)

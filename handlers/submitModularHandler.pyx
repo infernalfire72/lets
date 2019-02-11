@@ -238,9 +238,10 @@ class handler(requestsManager.asyncRequestHandler):
 			haxFlags = scoreData[17].count(' ') # 4 is normal, 0 is irregular but inconsistent.
 			if haxFlags != 4 and haxFlags != 0 and s.completed > 1 and restricted == False:
 
-				flagsReadable = generalUtils.calculateFlags(haxFlags, used_mods, s.gameMode)
-				userUtils.appendNotes(userID, "-- has received clientside flags: {} [{}] (cheated score id: {})".format(haxFlags, flagsReadable, s.scoreID))
-				log.warning("**{}** ({}) has received clientside anti cheat flags.\n\nFlags: {}.\n[{}]\n\nScore ID: {scoreID}\nReplay: https://akatsuki.pw/web/replays/{scoreID}".format(username, userID, haxFlags, flagsReadable, scoreID=s.scoreID), "cm")
+				flagsReadable = generalUtils.calculateFlags(int(haxFlags), used_mods, s.gameMode)
+				if len(flagsReadable) > 1:
+					userUtils.appendNotes(userID, "-- has received clientside flags: {} [{}] (cheated score id: {})".format(haxFlags, flagsReadable, s.scoreID))
+					log.warning("**{}** ({}) has received clientside anti cheat flags.\n\nFlags: {}.\n[{}]\n\nScore ID: {scoreID}\nReplay: https://akatsuki.pw/web/replays/{scoreID}".format(username, userID, haxFlags, flagsReadable, scoreID=s.scoreID), "cm")
 
 			if s.score < 0 or s.score > (2 ** 63) - 1:
 				userUtils.ban(userID)
