@@ -54,7 +54,8 @@ class handler(requestsManager.asyncRequestHandler):
 
 			# Increment 'replays watched by others' if needed
 			if replayData is not None:
-				userUtils.incrementReplaysWatched(replayData["userid"], replayData["play_mode"], replayData["mods"])
+				if username != replayData["uname"]:
+					userUtils.incrementReplaysWatched(replayData["userid"], replayData["play_mode"], replayData["mods"])
 
 			log.info("Serving replay_{}.osr".format(replayID))
 			fileName = ".data/replays/replay_{}.osr".format(replayID)
