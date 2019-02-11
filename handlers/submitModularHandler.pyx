@@ -43,6 +43,7 @@ class handler(requestsManager.asyncRequestHandler):
 	@tornado.gen.engine
 	#@sentry.captureTornado
 	def asyncPost(self):
+		newCharts = self.request.uri == "/web/osu-submit-modular-selector.php"
 		try:
 			# Resend the score in case of unhandled exceptions
 			keepSending = True
@@ -499,7 +500,7 @@ class handler(requestsManager.asyncRequestHandler):
 					scoreUtils.newFirst(s.scoreID, userID, s.fileMd5, s.gameMode, isRelaxing)
 
 				# Write message to client
-				self.write(msg)
+				self.write(output)
 			else:
 				# No ranking panel, send just "ok"
 				self.write("ok")
