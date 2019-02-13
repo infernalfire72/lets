@@ -75,6 +75,12 @@ class handler(requestsManager.asyncRequestHandler):
 				bmk = None
 				bml = None
 
+			# failed time?
+			if "ft" in self.request.arguments:
+				log.cmyui("true: {}".format(self.get_argument("ft")), discord='cm')
+			else:
+				log.cmyui("false", discord='cm')
+
 			# Get right AES Key
 			if "osuver" in self.request.arguments:
 				aeskey = "osu!-scoreburgr---------{}".format(self.get_argument("osuver"))
