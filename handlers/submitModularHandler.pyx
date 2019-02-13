@@ -75,12 +75,6 @@ class handler(requestsManager.asyncRequestHandler):
 				bmk = None
 				bml = None
 
-			# failed time?
-			if "ft" in self.request.arguments:
-				log.cmyui("true: {}".format(self.get_argument("ft")), discord='cm')
-			else:
-				log.cmyui("false", discord='cm')
-
 			# Get right AES Key
 			if "osuver" in self.request.arguments:
 				aeskey = "osu!-scoreburgr---------{}".format(self.get_argument("osuver"))
@@ -150,7 +144,7 @@ class handler(requestsManager.asyncRequestHandler):
 				try:
 					length = userUtils.getBeatmapTime(beatmapInfo.beatmapID)
 				except Exception:
-					log.error("Maxi's mirror must be down, as getBeatmapTime failed. L144 submitModular")
+					log.error("Error while contacting mirror server.")
 			else:
 				length = math.ceil(int(self.get_argument("ft")) / 1000)
 
