@@ -111,7 +111,7 @@ class handler(requestsManager.asyncRequestHandler):
 
 			# Get restricted
 			restricted = userUtils.isRestricted(userID)
-			
+
 			# Get variables for relax
 			used_mods = int(scoreData[13])
 			isRelaxing = used_mods & 128
@@ -141,10 +141,13 @@ class handler(requestsManager.asyncRequestHandler):
 			# increment user playtime
 			length = 0
 			if s.passed:
-				length = userUtils.getBeatmapTime(beatmapInfo.beatmapID)
+				try:
+					length = userUtils.getBeatmapTime(beatmapInfo.beatmapID)
+				except Exception:
+					log.error("Maxi's mirror must be down, as getBeatmapTime failed. L144 submitModular")
 			else:
 				length = math.ceil(int(self.get_argument("ft")) / 1000)
-				
+
 			userUtils.incrementPlaytime(userID, s.gameMode, length)
 			# Calculate PP
 			midPPCalcException = None
@@ -159,7 +162,7 @@ class handler(requestsManager.asyncRequestHandler):
 				log.error("Caught an exception in pp calculation, re-raising after saving score in db")
 				s.pp = 0
 				midPPCalcException = e
-				
+
 			# Restrict obvious cheaters™
 			if restricted == False:
 				if isRelaxing: # Relax
@@ -230,7 +233,6 @@ class handler(requestsManager.asyncRequestHandler):
 					oldPersonalBestRank = 0
 					oldPersonalBest = None			
 
-
 			# Save score in db
 			s.saveScoreInDB()
 
@@ -264,7 +266,7 @@ class handler(requestsManager.asyncRequestHandler):
 			# Ci metto la faccia, ci metto la testa e ci metto il mio cuore
 			if ((s.mods & mods.DOUBLETIME) > 0 and (s.mods & mods.HALFTIME) > 0) \
 					or ((s.mods & mods.HARDROCK) > 0 and (s.mods & mods.EASY) > 0) \
-					or ((s.mods & mods.SUDDENDEATH) > 0 and (s.mods & mods.NOFAIL) > 0)\
+					or ((s.mods & mods.SUDDENDEATH) > 0 and (s.mods & mods.NOFAIL) > 0) \
 					or ((s.mods & mods.RELAX) > 0 and (s.mods & mods.RELAX2) > 0):
 				userUtils.ban(userID)
 				userUtils.appendNotes(userID, "Impossible mod combination ({}).".format(s.mods))
@@ -348,7 +350,6 @@ class handler(requestsManager.asyncRequestHandler):
 					oldUserData = glob.userStatsCache.get(userID, s.gameMode)
 					oldRank = userUtils.getGameRank(userID, s.gameMode)
 
-
 			# Always update users stats (total/ranked score, playcount, level, acc and pp)
 			# even if not passed
 
@@ -401,7 +402,6 @@ class handler(requestsManager.asyncRequestHandler):
 			# and we got valid beatmap info from db
 			if beatmapInfo is not None and beatmapInfo != False and s.passed:
 				log.debug("Started building ranking panel.")
-
 
 				if isRelaxing: # Relax
 					# Trigger bancho stats cache update
@@ -498,6 +498,7 @@ class handler(requestsManager.asyncRequestHandler):
 					params = urlencode({"k": glob.conf.config["server"]["apikey"], "to": "#announce", "msg": annmsg})
 					requests.get("{}/api/v1/fokabotMessage?{}".format(glob.conf.config["server"]["banchourl"], params))
 
+					# Add the #1 to the database. Yes this is spaghetti.
 					scoreUtils.newFirst(s.scoreID, userID, s.fileMd5, s.gameMode, isRelaxing)
 
 				# Write message to client
