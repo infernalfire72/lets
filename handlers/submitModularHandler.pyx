@@ -243,7 +243,7 @@ class handler(requestsManager.asyncRequestHandler):
 				flagsReadable = generalUtils.calculateFlags(int(haxFlags), used_mods, s.gameMode)
 				if len(flagsReadable) > 1:
 					userUtils.appendNotes(userID, "-- has received clientside flags: {} [{}] (cheated score id: {})".format(haxFlags, flagsReadable, s.scoreID))
-					log.warning("**{}** ({}) has received clientside anti cheat flags.\n\nFlags: {}.\n[{}]\n\nScore ID: {scoreID}\nReplay: https://akatsuki.pw/web/replays/{scoreID}".format(username, userID, haxFlags, flagsReadable, scoreID=s.scoreID), "cm")
+					log.warning("**{}** (https://akatsuki.pw/{relax}u/{}) has received clientside anti cheat flags.\n\nFlags: {}.\n[{}]\n\nScore ID: {scoreID}\nReplay: https://akatsuki.pw/web/replays/{scoreID}".format(username, userID, haxFlags, flagsReadable, scoreID=s.scoreID), "cm", relax="rx/" if isRelaxing else "")
 
 			if s.score < 0 or s.score > (2 ** 63) - 1:
 				userUtils.ban(userID)
@@ -253,10 +253,10 @@ class handler(requestsManager.asyncRequestHandler):
 				if (s.score - (s.c300 * 300 + s.c100 * 100 + s.c50 * 50)) < 0 and not isRelaxing and s.gameMode == 0:
 					#userUtils.ban(userID)
 					#userUtils.appendNotes(userID, "Banned due to score being less than no-combo value.")
-					log.cmyui("{} has submitted a score where score is less than no-combo value. (scoreID: {}, score: {}, pp:{})".format(username, s.scoreID, s.score, s.pp), discord="cm")
+					log.cmyui("{} (https://akatsuki.pw/{relax}u/{}) has submitted a score where score is less than no-combo value. (scoreID: {}, score: {}, pp:{})".format(username, userID, s.scoreID, s.score, s.pp, relax="rx/" if isRelaxing else ""), discord="cm")
 
 				if s.fullCombo and s.cMiss > 0:
-					log.cmyui("{} has submitted a score with 'fullCombo' flag, but has > 0 misses. (scoreID: {}, score: {}, pp:{})".format(username, s.scoreID, s.score, s.pp), discord="cm")
+					log.cmyui("{} (https://akatsuki.pw/{relax}u/{}) has submitted a score with 'fullCombo' flag, but has > 0 misses. (scoreID: {}, score: {}, pp:{})".format(username, userID, s.scoreID, s.score, s.pp, relax="rx/" if isRelaxing else ""), discord="cm")
 
 			# Make sure the score is not memed
 			if s.gameMode == gameModes.MANIA and s.score > 1000000:
