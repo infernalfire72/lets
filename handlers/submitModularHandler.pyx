@@ -137,7 +137,7 @@ class handler(requestsManager.asyncRequestHandler):
 				log.debug("Beatmap is not submitted/outdated/unknown. Score submission aborted.")
 				return
 
-			# Increment user playtime
+			# increment user playtime
 			length = 0
 			if s.passed:
 				try:
@@ -283,24 +283,40 @@ class handler(requestsManager.asyncRequestHandler):
 
 					# Send to cono ALL passed replays, even non high-scores
 					if glob.conf.config["cono"]["enable"]:
+						if isRelaxing:
+							threading.Thread(target=lambda: glob.redis.publish(
+								"cono:analyze", json.dumps({
+									"score_id": s.scoreID,
+									"beatmap_id": beatmapInfo.beatmapID,
+									"user_id": s.playerUserID,
+									"game_mode": s.gameMode,
+									"pp": s.pp,
+									"replay_data": base64.b64encode(
+										replayHelper.rxbuildFullReplay(
+											s.scoreID,
+											rawReplay=self.request.files["score"][0]["body"]
+										)
+									).decode(),
+								})
+							)).start()
+						else:
 						# We run this in a separate thread to avoid slowing down scores submission,
 						# as cono needs a full replay
-						threading.Thread(target=lambda: glob.redis.publish(
-							"cono:analyze", json.dumps({
-								"score_id": s.scoreID,
-								"beatmap_id": beatmapInfo.beatmapID,
-								"user_id": s.playerUserID,
-								"game_mode": s.gameMode,
-								"pp": s.pp,
-								"replay_data": base64.b64encode(
-									replayHelper.buildFullReplay(
-										s.scoreID,
-										rawReplay=self.request.files["score"][0]["body"],
-										relax=1 if isRelaxing else 0
-									)
-								).decode(),
-							})
-						)).start()
+							threading.Thread(target=lambda: glob.redis.publish(
+								"cono:analyze", json.dumps({
+									"score_id": s.scoreID,
+									"beatmap_id": beatmapInfo.beatmapID,
+									"user_id": s.playerUserID,
+									"game_mode": s.gameMode,
+									"pp": s.pp,
+									"replay_data": base64.b64encode(
+										replayHelper.buildFullReplay(
+											s.scoreID,
+											rawReplay=self.request.files["score"][0]["body"]
+										)
+									).decode(),
+								})
+							)).start()
 				else:
 					# Restrict if no replay was provided
 					if not restricted:
