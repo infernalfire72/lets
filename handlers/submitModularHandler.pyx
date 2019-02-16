@@ -330,7 +330,9 @@ class handler(requestsManager.asyncRequestHandler):
 			beatmap.incrementPlaycount(s.fileMd5, s.passed)
 
 			# Print out score submission
-			log.info("[{}] {} has submitted a score on {}...".format("RELAX" if isRelaxing else "VANILLA", username, beatmapInfo.songName.encode().decode("ASCII", "ignore")))
+			songNameFull = beatmapInfo.songName.encode().decode("ASCII", "ignore")
+			songNameShort = songNameFull[:48]+"..." if len(songNameFull) > 48 else songNameFull[:-4]
+			log.info("[{}] {} has submitted a score on {}...".format("RELAX" if isRelaxing else "VANILLA", username, songNameShort))
 
 			# Let the api know of this score
 			if s.scoreID:

@@ -83,7 +83,7 @@ class handler(requestsManager.asyncRequestHandler):
 				friends = True
 
 			# Console output
-			fileNameShort = fileName[:32]+"..." if len(fileName) > 32 else fileName[:-4]
+			fileNameShort = fileName[:48]+"..." if len(fileName) > 48 else fileName[:-4]
 			log.info("[{}] Requested beatmap {}".format("RELAX" if scoreboardType == 1 and int(self.get_argument("mods")) & 128 else "VANILLA", fileNameShort))
 
 			# Create beatmap object and set its data
