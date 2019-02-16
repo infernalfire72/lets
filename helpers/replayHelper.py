@@ -5,11 +5,11 @@ from constants import exceptions, dataTypes
 from helpers import binaryHelper
 from objects import glob
 
-def buildFullReplay(scoreID=None, scoreData=None, rawReplay=None, relax):
+def buildFullReplay(scoreID=None, scoreData=None, rawReplay=None, relax=3):
     if all(v is None for v in (scoreID, scoreData)) or all(v is not None for v in (scoreID, scoreData)):
         raise AttributeError("Either scoreID or scoreData must be provided, not neither or both")
 
-    if relax is None:
+    if relax == 3:
         raise AttributeError("Not specified whether the replay is relax or regular. WILL NOT BUILD REPLAY!")
 
     if scoreData is None:
