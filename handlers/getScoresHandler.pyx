@@ -84,10 +84,7 @@ class handler(requestsManager.asyncRequestHandler):
 
 			# Console output
 			fileNameShort = fileName[:32]+"..." if len(fileName) > 32 else fileName[:-4]
-			if scoreboardType == 1 and int(self.get_argument("mods")) & 128:
-				log.info("[RELAX] Requested beatmap {} ({})".format(fileNameShort, md5))
-			else:
-				log.info("[VANILLA] Requested beatmap {} ({})".format(fileNameShort, md5))
+			log.info("[{}] Requested beatmap {}".format("RELAX" if scoreboardType == 1 and int(self.get_argument("mods")) & 128 else "VANILLA", fileNameShort))
 
 			# Create beatmap object and set its data
 			bmap = beatmap.beatmap(md5, beatmapSetID, gameMode)
