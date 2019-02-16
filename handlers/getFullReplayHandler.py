@@ -15,10 +15,8 @@ class handler(requestsManager.asyncRequestHandler):
 	@tornado.gen.engine
 	@sentry.captureTornado
 	def asyncGet(self, replayID):
-		try:
-			fullReplay = replayHelper.buildFullReplay(scoreID=replayID)
-		except (exceptions.fileNotFoundException, exceptions.scoreNotFoundError):
-			fullReplay = replayHelper.rxbuildFullReplay(scoreID=replayID)
+		
+		fullReplay = replayHelper.buildFullReplay(scoreID=replayID, relax=0 if replayID > 500000000 else 1)
 
 		self.write(fullReplay)
 		self.add_header("Content-type", "application/octet-stream")

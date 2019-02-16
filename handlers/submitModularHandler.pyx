@@ -117,7 +117,6 @@ class handler(requestsManager.asyncRequestHandler):
 			isRelaxing = used_mods & 128
 
 			# Create score object and set its data
-			log.info("[{}] {} has submitted a score on {}...".format("RELAX" if isRelaxing else "VANILLA", username, scoreData[0]))
 			s = rxscore.score() if isRelaxing else score.score()
 			s.setDataFromScoreData(scoreData)
 
@@ -138,7 +137,7 @@ class handler(requestsManager.asyncRequestHandler):
 				log.debug("Beatmap is not submitted/outdated/unknown. Score submission aborted.")
 				return
 
-			# increment user playtime
+			# Increment user playtime
 			length = 0
 			if s.passed:
 				try:
@@ -284,40 +283,24 @@ class handler(requestsManager.asyncRequestHandler):
 
 					# Send to cono ALL passed replays, even non high-scores
 					if glob.conf.config["cono"]["enable"]:
-						if isRelaxing:
-							threading.Thread(target=lambda: glob.redis.publish(
-								"cono:analyze", json.dumps({
-									"score_id": s.scoreID,
-									"beatmap_id": beatmapInfo.beatmapID,
-									"user_id": s.playerUserID,
-									"game_mode": s.gameMode,
-									"pp": s.pp,
-									"replay_data": base64.b64encode(
-										replayHelper.rxbuildFullReplay(
-											s.scoreID,
-											rawReplay=self.request.files["score"][0]["body"]
-										)
-									).decode(),
-								})
-							)).start()
-						else:
 						# We run this in a separate thread to avoid slowing down scores submission,
 						# as cono needs a full replay
-							threading.Thread(target=lambda: glob.redis.publish(
-								"cono:analyze", json.dumps({
-									"score_id": s.scoreID,
-									"beatmap_id": beatmapInfo.beatmapID,
-									"user_id": s.playerUserID,
-									"game_mode": s.gameMode,
-									"pp": s.pp,
-									"replay_data": base64.b64encode(
-										replayHelper.buildFullReplay(
-											s.scoreID,
-											rawReplay=self.request.files["score"][0]["body"]
-										)
-									).decode(),
-								})
-							)).start()
+						threading.Thread(target=lambda: glob.redis.publish(
+							"cono:analyze", json.dumps({
+								"score_id": s.scoreID,
+								"beatmap_id": beatmapInfo.beatmapID,
+								"user_id": s.playerUserID,
+								"game_mode": s.gameMode,
+								"pp": s.pp,
+								"replay_data": base64.b64encode(
+									replayHelper.buildFullReplay(
+										s.scoreID,
+										rawReplay=self.request.files["score"][0]["body"],
+										relax=1 if isRelaxing else 0
+									)
+								).decode(),
+							})
+						)).start()
 				else:
 					# Restrict if no replay was provided
 					if not restricted:
@@ -329,6 +312,9 @@ class handler(requestsManager.asyncRequestHandler):
 
 			# Update beatmap playcount (and passcount)
 			beatmap.incrementPlaycount(s.fileMd5, s.passed)
+
+			# Print out score submission
+			log.info("[{}] {} has submitted a score on {}...".format("RELAX" if isRelaxing else "VANILLA", username, beatmapInfo.songName.encode().decode("ASCII", "ignore")))
 
 			# Let the api know of this score
 			if s.scoreID:
