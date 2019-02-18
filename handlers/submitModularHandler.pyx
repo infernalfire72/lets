@@ -242,7 +242,7 @@ class handler(requestsManager.asyncRequestHandler):
 				flagsReadable = generalUtils.calculateFlags(int(haxFlags), used_mods, s.gameMode)
 				if len(flagsReadable) > 1:
 					userUtils.appendNotes(userID, "-- has received clientside flags: {} [{}] (cheated score id: {})".format(haxFlags, flagsReadable, s.scoreID))
-					log.warning("**{}** (https://akatsuki.pw/{relax}u/{}) has received clientside anti cheat flags.\n\nFlags: {}.\n[{}]\n\nScore ID: {scoreID}\nReplay: https://akatsuki.pw/web/replays/{scoreID}".format(username, userID, haxFlags, flagsReadable, scoreID=s.scoreID), "cm", relax="rx/" if isRelaxing else "")
+					log.warning("**{}** (https://akatsuki.pw/{relax}u/{}) has received clientside anti cheat flags.\n\nFlags: {}.\n[{}]\n\nScore ID: {scoreID}\nReplay: https://akatsuki.pw/web/replays/{scoreID}".format(username, userID, haxFlags, flagsReadable, scoreID=s.scoreID, relax="rx/" if isRelaxing else ""), "cm")
 
 			if s.score < 0 or s.score > (2 ** 63) - 1:
 				userUtils.ban(userID)
