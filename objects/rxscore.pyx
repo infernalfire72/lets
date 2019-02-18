@@ -206,7 +206,7 @@ class score:
 			self.rank,
 			self.date)
 
-	def setCompletedStatus(self, b = None):
+	def setCompletedStatus(self):
 		"""
 		Set this score completed status and rankedScoreIncrease
 		"""
@@ -216,8 +216,7 @@ class score:
 			userID = userUtils.getID(self.playerName)
 
 		# Create beatmap object
-		if b is None:
-			b = beatmap.beatmap(self.fileMd5, 0)
+		b = beatmap.beatmap(self.fileMd5, 0)
 
 			# Make sure we don't have another score identical to this one
 			duplicate = glob.db.fetch("SELECT id FROM scores_relax WHERE userid = %s AND beatmap_md5 = %s AND play_mode = %s AND time = %s AND score = %s LIMIT 1", [userID, self.fileMd5, self.gameMode, self.date, self.score])
