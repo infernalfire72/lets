@@ -235,7 +235,7 @@ class score:
 				self.oldPersonalBest = 0
 			else:
 				# Compare personal best's score with current score
-				if b.rankedStatus == rankedStatus.RANKED:
+				if b.rankedStatus == rankedStatuses.RANKED:
 					if self.pp > personalBest["pp"]:
 						# New best score
 						self.completed = 3
@@ -245,7 +245,7 @@ class score:
 						self.completed = 2
 						self.rankedScoreIncrease = 0
 						self.oldPersonalBest = 0
-				elif b.rankedStatus == rankedStatus.LOVED:
+				elif b.rankedStatus == rankedStatuses.LOVED:
 					if self.score > personalBest["score"]:
 						# New best score
 						self.completed = 3
