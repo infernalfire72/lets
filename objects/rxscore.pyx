@@ -237,7 +237,7 @@ class score:
 				self.oldPersonalBest = 0
 			else:
 				# Compare personal best's score with current score
-				if b.rankedStatus == rankedStatuses.RANKED:
+				if b.rankedStatus == rankedStatuses.RANKED or b.rankedStatus == rankedStatuses.APPROVED:
 					if self.pp > personalBest["pp"]:
 						# New best score
 						self.completed = 3
