@@ -60,9 +60,11 @@ class beatmap:
 				self.rankedStatus = bdata["ranked"]
 			log.debug("Deleting old beatmap data ({})".format(bdata["id"]))
 			glob.db.execute("DELETE FROM beatmaps WHERE id = %s LIMIT 1", [bdata["id"]])
+			log.cmyui("0: {}".format(self.beatmapID), discord="cm")
 		else:
 			# Unfreeze beatmap status
 			frozen = 0
+			log.cmyui("1: {}".format(self.beatmapID), discord="cm")
 
 		# Add new beatmap data
 		log.debug("Saving beatmap data in db...")
@@ -84,6 +86,7 @@ class beatmap:
 			int(time.time()),
 			frozen
 		])
+		log.cmyui("2: {}".format(self.beatmapID), discord="cm")
 
 	def setDataFromDB(self, md5):
 		"""

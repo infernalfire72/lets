@@ -523,6 +523,9 @@ def main():
         "-r", "--recalc", help="calculates pp for all high scores", required=False, action="store_true"
     )
     recalc_group.add_argument(
+        "-c", "--cmyui", help="calculates pp with cmyui flag", required=False, action="store_true"
+    )
+    recalc_group.add_argument(
         "-z", "--zero", help="calculates pp for 0 pp high scores", required=False, action="store_true"
     )
     recalc_group.add_argument("-i", "--id", help="calculates pp for the score with this score_id", required=False)
@@ -592,6 +595,7 @@ def main():
     # Get recalculator
     recalculators_gen = {
         "zero": lambda: SimpleRecalculator(("scores_relax.completed = 3", "pp = 0")),
+        "cmyui": lambda: SimpleRecalculator(("scores_relax.completed = 3", "pp > 662", "pp < 664")),
         "recalc": lambda: SimpleRecalculator(("scores_relax.completed = 3", "pp > 750")),
         "mods": lambda: SimpleRecalculator(("scores_relax.completed = 3", "mods & %s > 0"), (args.mods,)),
         "id": lambda: SimpleRecalculator(("scores_relax.id = %s",), (args.id,)),
