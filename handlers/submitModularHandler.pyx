@@ -163,7 +163,7 @@ class handler(requestsManager.asyncRequestHandler):
 				midPPCalcException = e
 
 			# Restrict obvious cheaters™
-			if restricted == False:
+			if not restricted:
 				if isRelaxing: # Relax
 					rxGods = [7340, 2137, 6868, 1215, 15066, 14522, 1325, 5798, 21610, 1254, 15070, 3445, 17157, 14791, 14728, 1366, 2961, 5524, 1188, 1401, 26754, 3388, 5692, 2173, 4299] # Yea yea it's a bad way of doing it; will fix.
 					"""
@@ -208,17 +208,52 @@ class handler(requestsManager.asyncRequestHandler):
 						log.warning("[osu!catch] **{}** ({}) has been restricted due to too high pp gain **({}pp)**.".format(username, userID, s.pp), "cm")
 						"""
 
-			# Check notepad hack
-			if bmk is None and bml is None:
-				# No bmk and bml params passed, edited or super old client
-				#log.warning("{} ({}) most likely submitted a score from an edited client or a super old client".format(username, userID), "cm")
-				pass
-			elif bmk != bml and not restricted:
-				# bmk and bml passed and they are different, restrict the user
-				userUtils.restrict(userID)
-				userUtils.appendNotes(userID, "Restricted due to notepad hack")
-				log.warning("**{}** ({}) has been restricted due to notepad hack".format(username, userID), "cm")
-				return
+				# Client anti-cheat flags
+				haxFlags = scoreData[17].count(' ') # 4 is normal, 0 is irregular but inconsistent.
+				if haxFlags != 4 and haxFlags != 0 and s.completed > 1:
+
+					flagsReadable = generalUtils.calculateFlags(int(haxFlags), used_mods, s.gameMode)
+					if len(flagsReadable) > 1:
+						userUtils.appendNotes(userID, "-- has received clientside flags: {} [{}] (cheated score id: {})".format(haxFlags, flagsReadable, s.scoreID))
+						log.warning("**{}** (https://akatsuki.pw/{relax}u/{}) has received clientside anti cheat flags.\n\nFlags: {}.\n[{}]\n\nScore ID: {scoreID}\nReplay: https://akatsuki.pw/web/replays/{scoreID}".format(username, userID, haxFlags, flagsReadable, scoreID=s.scoreID, relax="rx/" if isRelaxing else ""), "cm")
+
+				if s.score < 0 or s.score > (2 ** 63) - 1:
+					userUtils.ban(userID)
+					userUtils.appendNotes(userID, "Banned due to negative score.")
+
+				if s.completed == 3: # just incase :)!
+					if (s.score - (s.c300 * 300 + s.c100 * 100 + s.c50 * 50)) < 0 and not isRelaxing and s.gameMode == 0:
+						#userUtils.ban(userID)
+						#userUtils.appendNotes(userID, "Banned due to score being less than no-combo value.")
+						log.cmyui("{} (https://akatsuki.pw/{relax}u/{}) has submitted a score where score is less than no-combo value. (scoreID: {}, score: {}, pp:{})".format(username, userID, s.scoreID, s.score, s.pp, relax="rx/" if isRelaxing else ""), discord="cm")
+
+					if s.fullCombo and s.cMiss > 0:
+						log.cmyui("{} (https://akatsuki.pw/{relax}u/{}) has submitted a score with 'fullCombo' flag, but has > 0 misses. (scoreID: {}, score: {}, pp:{})".format(username, userID, s.scoreID, s.score, s.pp, relax="rx/" if isRelaxing else ""), discord="cm")
+
+				# Make sure the score is not memed
+				if s.gameMode == gameModes.MANIA and s.score > 1000000:
+					userUtils.ban(userID)
+					userUtils.appendNotes(userID, "Banned due to mania score > 1000000.")
+
+				# Ci metto la faccia, ci metto la testa e ci metto il mio cuore
+				if ((s.mods & mods.DOUBLETIME) > 0 and (s.mods & mods.HALFTIME) > 0) \
+						or ((s.mods & mods.HARDROCK) > 0 and (s.mods & mods.EASY) > 0) \
+						or ((s.mods & mods.SUDDENDEATH) > 0 and (s.mods & mods.NOFAIL) > 0) \
+						or ((s.mods & mods.RELAX) > 0 and (s.mods & mods.RELAX2) > 0):
+					userUtils.ban(userID)
+					userUtils.appendNotes(userID, "Impossible mod combination ({}).".format(s.mods))
+
+				# Check notepad hack
+				if bmk is None and bml is None:
+					# No bmk and bml params passed, edited or super old client
+					#log.warning("{} ({}) most likely submitted a score from an edited client or a super old client".format(username, userID), "cm")
+					pass
+				elif bmk != bml:
+					# bmk and bml passed and they are different, restrict the user
+					userUtils.restrict(userID)
+					userUtils.appendNotes(userID, "Restricted due to notepad hack")
+					log.warning("**{}** ({}) has been restricted due to notepad hack".format(username, userID), "cm")
+					return
 
 				# Right before submitting the score, get the personal best score object (we need it for charts)
 			if s.passed and s.oldPersonalBest > 0:
@@ -234,41 +269,6 @@ class handler(requestsManager.asyncRequestHandler):
 
 			# Save score in db
 			s.saveScoreInDB()
-
-			# Client anti-cheat flags
-			haxFlags = scoreData[17].count(' ') # 4 is normal, 0 is irregular but inconsistent.
-			if haxFlags != 4 and haxFlags != 0 and s.completed > 1 and restricted == False:
-
-				flagsReadable = generalUtils.calculateFlags(int(haxFlags), used_mods, s.gameMode)
-				if len(flagsReadable) > 1:
-					userUtils.appendNotes(userID, "-- has received clientside flags: {} [{}] (cheated score id: {})".format(haxFlags, flagsReadable, s.scoreID))
-					log.warning("**{}** (https://akatsuki.pw/{relax}u/{}) has received clientside anti cheat flags.\n\nFlags: {}.\n[{}]\n\nScore ID: {scoreID}\nReplay: https://akatsuki.pw/web/replays/{scoreID}".format(username, userID, haxFlags, flagsReadable, scoreID=s.scoreID, relax="rx/" if isRelaxing else ""), "cm")
-
-			if s.score < 0 or s.score > (2 ** 63) - 1:
-				userUtils.ban(userID)
-				userUtils.appendNotes(userID, "Banned due to negative score.")
-
-			if s.completed == 3: # just incase :)!
-				if (s.score - (s.c300 * 300 + s.c100 * 100 + s.c50 * 50)) < 0 and not isRelaxing and s.gameMode == 0:
-					#userUtils.ban(userID)
-					#userUtils.appendNotes(userID, "Banned due to score being less than no-combo value.")
-					log.cmyui("{} (https://akatsuki.pw/{relax}u/{}) has submitted a score where score is less than no-combo value. (scoreID: {}, score: {}, pp:{})".format(username, userID, s.scoreID, s.score, s.pp, relax="rx/" if isRelaxing else ""), discord="cm")
-
-				if s.fullCombo and s.cMiss > 0:
-					log.cmyui("{} (https://akatsuki.pw/{relax}u/{}) has submitted a score with 'fullCombo' flag, but has > 0 misses. (scoreID: {}, score: {}, pp:{})".format(username, userID, s.scoreID, s.score, s.pp, relax="rx/" if isRelaxing else ""), discord="cm")
-
-			# Make sure the score is not memed
-			if s.gameMode == gameModes.MANIA and s.score > 1000000:
-				userUtils.ban(userID)
-				userUtils.appendNotes(userID, "Banned due to mania score > 1000000.")
-
-			# Ci metto la faccia, ci metto la testa e ci metto il mio cuore
-			if ((s.mods & mods.DOUBLETIME) > 0 and (s.mods & mods.HALFTIME) > 0) \
-					or ((s.mods & mods.HARDROCK) > 0 and (s.mods & mods.EASY) > 0) \
-					or ((s.mods & mods.SUDDENDEATH) > 0 and (s.mods & mods.NOFAIL) > 0) \
-					or ((s.mods & mods.RELAX) > 0 and (s.mods & mods.RELAX2) > 0):
-				userUtils.ban(userID)
-				userUtils.appendNotes(userID, "Impossible mod combination ({}).".format(s.mods))
 
 			# NOTE: Process logging was removed from the client starting from 20180322
 			# Save replay for all passed scores
