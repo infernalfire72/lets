@@ -12,7 +12,7 @@ except:
 ACHIEVEMENTS_VERSION = 1
 
 DATADOG_PREFIX = "lets"
-BOT_NAME = "Charlotte"
+BOT_NAME = "Aika"
 db = None
 redis = None
 conf = None
