@@ -55,43 +55,31 @@ class handler(requestsManager.asyncRequestHandler):
 			screenshotID = ""
 			while not found:
 				screenshotID = generalUtils.randomString(8)
-				if userID == 1000:
-					if not os.path.isfile(".data/screenshots/{}.png".format(screenshotID)):
-						found = True
-				else:
-					if not os.path.isfile(".data/screenshots/{}.jpg".format(screenshotID)):
-						found = True
+				if not os.path.isfile(".data/screenshots/{}.png".format(screenshotID)):
+					found = True
 
 			# Write screenshot file to .data folder
-			if userID == 1000:
-				with open(".data/screenshots/{}.png".format(screenshotID), "wb") as f:
-					f.write(self.request.files["ss"][0]["body"])
-			else:
-				with open(".data/screenshots/{}.jpg".format(screenshotID), "wb") as f:
-					f.write(self.request.files["ss"][0]["body"])
+			with open(".data/screenshots/{}.png".format(screenshotID), "wb") as f:
+				f.write(self.request.files["ss"][0]["body"])
 
-			if userID == 1000:
-				# Add Akatsuki's watermark
-				base_screenshot = Image.open('.data/screenshots/{}.png'.format(screenshotID))
-				watermark = Image.open('constants/watermark.png')
-				width, height = base_screenshot.size
+			# Add Akatsuki's watermark
+			base_screenshot = Image.open('.data/screenshots/{}.png'.format(screenshotID))
+			watermark = Image.open('constants/watermark.png')
+			width, height = base_screenshot.size
 
-				position = (width - 330, height - 200)
+			position = (width - 330, height - 200)
 
-				transparent = Image.new('RGBA', (width, height), (0,0,0,0))
-				transparent.paste(base_screenshot, (0,0))
-				transparent.paste(watermark, position, mask=watermark)
-				transparent.show()
-				transparent.save('.data/screenshots/{}.png'.format(screenshotID))
+			transparent = Image.new('RGBA', (width, height), (0,0,0,0))
+			transparent.paste(base_screenshot, (0,0))
+			transparent.paste(watermark, position, mask=watermark)
+			transparent.show()
+			transparent.save('.data/screenshots/{}.png'.format(screenshotID))
 
 			# Output
 			log.info("New screenshot ({})".format(screenshotID))
 
 			# Return screenshot link
-			if userID == 1000:
-				self.write("{}/ss/{}.png".format(glob.conf.config["server"]["servername"], screenshotID))
-			else:
-				self.write("{}/ss/{}.jpg".format(glob.conf.config["server"]["servername"], screenshotID))
+			self.write("{}/ss/{}.png".format(glob.conf.config["server"]["servername"], screenshotID))
 		except exceptions.need2FAException:
 			pass
 		except exceptions.invalidArgumentsException:
