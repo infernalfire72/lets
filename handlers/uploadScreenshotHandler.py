@@ -55,16 +55,23 @@ class handler(requestsManager.asyncRequestHandler):
 			screenshotID = ""
 			while not found:
 				screenshotID = generalUtils.randomString(8)
-				if not os.path.isfile(".data/screenshots/{}.jpg".format(screenshotID)):
+				if userID == 1001:
+					if not os.path.isfile(".data/screenshots/{}.png".format(screenshotID)):
+				else:
+					if not os.path.isfile(".data/screenshots/{}.jpg".format(screenshotID)):
 					found = True
 
 			# Write screenshot file to .data folder
-			with open(".data/screenshots/{}.jpg".format(screenshotID), "wb") as f:
-				f.write(self.request.files["ss"][0]["body"])
+			if userID == 1001:
+				with open(".data/screenshots/{}.png".format(screenshotID), "wb") as f:
+					f.write(self.request.files["ss"][0]["body"])
+			else:
+				with open(".data/screenshots/{}.jpg".format(screenshotID), "wb") as f:
+					f.write(self.request.files["ss"][0]["body"])
 
 			if userID == 1001:
 				# Add Akatsuki's watermark
-				base_screenshot = Image.open('.data/screenshots/{}.jpg'.format(screenshotID))
+				base_screenshot = Image.open('.data/screenshots/{}.png'.format(screenshotID))
 				watermark = Image.open('constants/watermark.png')
 				width, height = base_screenshot.size
 
@@ -74,13 +81,16 @@ class handler(requestsManager.asyncRequestHandler):
 				transparent.paste(base_screenshot, (0,0))
 				transparent.paste(watermark, position, mask=watermark)
 				transparent.show()
-				transparent.save('.data/screenshots/{}.jpg'.format(screenshotID))
+				transparent.save('.data/screenshots/{}.png'.format(screenshotID))
 
 			# Output
 			log.info("New screenshot ({})".format(screenshotID))
 
 			# Return screenshot link
-			self.write("{}/ss/{}.jpg".format(glob.conf.config["server"]["servername"], screenshotID))
+			if userID == 1001:
+				self.write("{}/ss/{}.png".format(glob.conf.config["server"]["servername"], screenshotID))
+			else:
+				self.write("{}/ss/{}.jpg".format(glob.conf.config["server"]["servername"], screenshotID))
 		except exceptions.need2FAException:
 			pass
 		except exceptions.invalidArgumentsException:
