@@ -57,9 +57,10 @@ class handler(requestsManager.asyncRequestHandler):
 				screenshotID = generalUtils.randomString(8)
 				if userID == 1001:
 					if not os.path.isfile(".data/screenshots/{}.png".format(screenshotID)):
+						found = True
 				else:
 					if not os.path.isfile(".data/screenshots/{}.jpg".format(screenshotID)):
-					found = True
+						found = True
 
 			# Write screenshot file to .data folder
 			if userID == 1001:
