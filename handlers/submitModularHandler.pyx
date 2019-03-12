@@ -208,28 +208,6 @@ class handler(requestsManager.asyncRequestHandler):
 						log.warning("[osu!catch] **{}** ({}) has been restricted due to too high pp gain **({}pp)**.".format(username, userID, s.pp), "cm")
 						"""
 
-				# Client anti-cheat flags
-				haxFlags = scoreData[17].count(' ') # 4 is normal, 0 is irregular but inconsistent.
-				if haxFlags != 4 and haxFlags != 0 and s.completed > 1:
-
-					flagsReadable = generalUtils.calculateFlags(int(haxFlags), used_mods, s.gameMode)
-					if len(flagsReadable) > 1:
-						userUtils.appendNotes(userID, "-- has received clientside flags: {} [{}] (cheated score id: {})".format(haxFlags, flagsReadable, s.scoreID))
-						log.warning("**{}** (https://akatsuki.pw/{relax}u/{}) has received clientside anti cheat flags.\n\nFlags: {}.\n[{}]\n\nScore ID: {scoreID}\nReplay: https://akatsuki.pw/web/replays/{scoreID}".format(username, userID, haxFlags, flagsReadable, scoreID=s.scoreID, relax="rx/" if isRelaxing else ""), "cm")
-
-				if s.score < 0 or s.score > (2 ** 63) - 1:
-					userUtils.ban(userID)
-					userUtils.appendNotes(userID, "Banned due to negative score.")
-
-				if s.completed == 3: # just incase :)!
-					if (s.score - (s.c300 * 300 + s.c100 * 100 + s.c50 * 50)) < 0 and not isRelaxing and s.gameMode == 0:
-						#userUtils.ban(userID)
-						#userUtils.appendNotes(userID, "Banned due to score being less than no-combo value.")
-						log.cmyui("{} (https://akatsuki.pw/{relax}u/{}) has submitted a score where score is less than no-combo value. (scoreID: {}, score: {}, pp:{})".format(username, userID, s.scoreID, s.score, s.pp, relax="rx/" if isRelaxing else ""), discord="cm")
-
-					if s.fullCombo and s.cMiss > 0:
-						log.cmyui("{} (https://akatsuki.pw/{relax}u/{}) has submitted a score with 'fullCombo' flag, but has > 0 misses. (scoreID: {}, score: {}, pp:{})".format(username, userID, s.scoreID, s.score, s.pp, relax="rx/" if isRelaxing else ""), discord="cm")
-
 				# Make sure the score is not memed
 				if s.gameMode == gameModes.MANIA and s.score > 1000000:
 					userUtils.ban(userID)
@@ -265,10 +243,33 @@ class handler(requestsManager.asyncRequestHandler):
 					oldPersonalBest = score.score(s.oldPersonalBest, oldPersonalBestRank)
 			else:
 					oldPersonalBestRank = 0
-					oldPersonalBest = None			
+					oldPersonalBest = None
 
 			# Save score in db
 			s.saveScoreInDB()
+
+			if not restricted:
+				# Client anti-cheat flags
+				haxFlags = scoreData[17].count(' ') # 4 is normal, 0 is irregular but inconsistent.
+				if haxFlags != 4 and haxFlags != 0 and s.completed > 1:
+
+					flagsReadable = generalUtils.calculateFlags(int(haxFlags), used_mods, s.gameMode)
+					if len(flagsReadable) > 1:
+						userUtils.appendNotes(userID, "-- has received clientside flags: {} [{}] (cheated score id: {})".format(haxFlags, flagsReadable, s.scoreID))
+						log.warning("**{}** (https://akatsuki.pw/{relax}u/{}) has received clientside anti cheat flags.\n\nFlags: {}.\n[{}]\n\nScore ID: {scoreID}\nReplay: https://akatsuki.pw/web/replays/{scoreID}".format(username, userID, haxFlags, flagsReadable, scoreID=s.scoreID, relax="rx/" if isRelaxing else ""), "cm")
+
+				if s.score < 0 or s.score > (2 ** 63) - 1:
+					userUtils.ban(userID)
+					userUtils.appendNotes(userID, "Banned due to negative score.")
+
+				if s.completed == 3: # just incase :)!
+					if (s.score - (s.c300 * 300 + s.c100 * 100 + s.c50 * 50)) < 0 and not isRelaxing and s.gameMode == 0:
+						#userUtils.ban(userID)
+						#userUtils.appendNotes(userID, "Banned due to score being less than no-combo value.")
+						log.cmyui("{} (https://akatsuki.pw/{relax}u/{}) has submitted a score where score is less than no-combo value. (scoreID: {}, score: {}, pp:{})".format(username, userID, s.scoreID, s.score, s.pp, relax="rx/" if isRelaxing else ""), discord="cm")
+
+					if s.fullCombo and s.cMiss > 0:
+						log.cmyui("{} (https://akatsuki.pw/{relax}u/{}) has submitted a score with 'fullCombo' flag, but has > 0 misses. (scoreID: {}, score: {}, pp:{})".format(username, userID, s.scoreID, s.score, s.pp, relax="rx/" if isRelaxing else ""), discord="cm")
 
 			# NOTE: Process logging was removed from the client starting from 20180322
 			# Save replay for all passed scores
