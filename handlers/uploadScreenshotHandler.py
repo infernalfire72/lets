@@ -5,7 +5,7 @@ import traceback
 import tornado.gen
 import tornado.web
 from raven.contrib.tornado import SentryMixin
-import Image
+from PIL import Image
 
 from common.log import logUtils as log
 from common.ripple import userUtils
