@@ -66,7 +66,7 @@ class handler(requestsManager.asyncRequestHandler):
 				# Add Akatsuki's watermark
 				base_screenshot = Image.open('.data/screenshots/{}.jpg'.format(screenshotID))
 				watermark = Image.open('constants/watermark.png')
-				width, height = base_image.size
+				width, height = base_screenshot.size
 
 				position = (width - 330, height - 200)
 
