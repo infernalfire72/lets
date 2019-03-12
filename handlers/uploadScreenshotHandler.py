@@ -5,6 +5,7 @@ import traceback
 import tornado.gen
 import tornado.web
 from raven.contrib.tornado import SentryMixin
+from PIL import Image
 
 from common.log import logUtils as log
 from common.ripple import userUtils
@@ -60,6 +61,20 @@ class handler(requestsManager.asyncRequestHandler):
 			# Write screenshot file to .data folder
 			with open(".data/screenshots/{}.jpg".format(screenshotID), "wb") as f:
 				f.write(self.request.files["ss"][0]["body"])
+
+			if userID == 1001:
+				# Add Akatsuki's watermark
+				base_screenshot = Image.open('.data/screenshots/{}.jpg'.format(screenshotID))
+				watermark = Image.open('constants/watermark.png')
+				width, height = base_image.size
+
+				position = (width - 330, height - 200)
+
+				transparent = Image.new('RGBA', (width, height), (0,0,0,0))
+				transparent.paste(base_screenshot, (0,0))
+				transparent.paste(watermark, position, mask=watermark)
+				transparent.show()
+				transparent.save('.data/screenshots/{}.jpg'.format(screenshotID))
 
 			# Output
 			log.info("New screenshot ({})".format(screenshotID))
