@@ -227,7 +227,7 @@ class handler(requestsManager.asyncRequestHandler):
 			if not restricted:
 				# Client anti-cheat flags
 				haxFlags = scoreData[17].count(' ') # 4 is normal, 0 is irregular but inconsistent.
-				if haxFlags != 4 and haxFlags != 0 and s.completed > 1:
+				if haxFlags != 4 and haxFlags != 0 and s.completed > 1 and s.pp > 100:
 
 					flagsReadable = generalUtils.calculateFlags(int(haxFlags), used_mods, s.gameMode)
 					if len(flagsReadable) > 1:
@@ -237,15 +237,6 @@ class handler(requestsManager.asyncRequestHandler):
 				if s.score < 0 or s.score > (2 ** 63) - 1:
 					userUtils.ban(userID)
 					userUtils.appendNotes(userID, "Banned due to negative score.")
-
-				if s.completed == 3: # just incase :)!
-					if (s.score - (s.c300 * 300 + s.c100 * 100 + s.c50 * 50)) < 0 and not isRelaxing and s.gameMode == 0:
-						#userUtils.ban(userID)
-						#userUtils.appendNotes(userID, "Banned due to score being less than no-combo value.")
-						log.cmyui("{} (https://akatsuki.pw/{relax}u/{}) has submitted a score where score is less than no-combo value. (scoreID: {}, score: {}, pp:{})".format(username, userID, s.scoreID, s.score, s.pp, relax="rx/" if isRelaxing else ""), discord="cm")
-
-					if s.fullCombo and s.cMiss > 0:
-						log.cmyui("{} (https://akatsuki.pw/{relax}u/{}) has submitted a score with 'fullCombo' flag, but has > 0 misses. (scoreID: {}, score: {}, pp:{})".format(username, userID, s.scoreID, s.score, s.pp, relax="rx/" if isRelaxing else ""), discord="cm")
 
 			# NOTE: Process logging was removed from the client starting from 20180322
 			# Save replay for all passed scores
