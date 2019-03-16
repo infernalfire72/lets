@@ -164,49 +164,25 @@ class handler(requestsManager.asyncRequestHandler):
 
 			# Restrict obvious cheaters™
 			if not restricted:
-				if isRelaxing: # Relax
-					rxGods = [7340, 2137, 6868, 1215, 15066, 14522, 1325, 5798, 21610, 1254, 15070, 3445, 17157, 14791, 14728, 1366, 2961, 5524, 1188, 1401, 26754, 3388, 5692, 2173, 4299] # Yea yea it's a bad way of doing it; will fix.
-					"""
-					CTBLIST = []
-					TAIKOLIST = []
-					"""
-					if s.gameMode == gameModes.STD and userID not in rxGods:
-						if (s.pp >= 1100) and used_mods & 1024 and userID != 17547: # MBMasher plays too much FL; make him an exception just incase.
-							userUtils.restrict(userID)
-							userUtils.appendNotes(userID, "[osu!] Restricted due to too high pp gain with FLASHLIGHT ({}pp).".format(s.pp))
-							log.warning("[osu!] **{}** ({}) has been restricted due to too high pp gain with FLASHLIGHT **({}pp)**.".format(username, userID, s.pp), "cm")
-						elif (s.pp >= 1600):
-							userUtils.restrict(userID)
-							userUtils.appendNotes(userID, "[osu!] Restricted due to too high pp gain ({}pp).".format(s.pp))
-							log.warning("[osu!] **{}** ({}) has been restricted due to too high pp gain **({}pp)**.".format(username, userID, s.pp), "cm")
-					elif (s.pp >= 1000) and s.gameMode == gameModes.TAIKO:
-						userUtils.restrict(userID)
-						userUtils.appendNotes(userID, "[osu!taiko] Restricted due to too high pp gain ({}pp).".format(s.pp))
-						log.warning("[osu!taiko] **{}** ({}) has been restricted due to too high pp gain **({}pp)**.".format(username, userID, s.pp), "cm")
-					elif (s.pp >= 1350) and s.gameMode == gameModes.CTB:
-						userUtils.restrict(userID)
-						userUtils.appendNotes(userID, "[osu!catch] Restricted due to too high pp gain ({}pp).".format(s.pp))
-						log.warning("[osu!catch] **{}** ({}) has been restricted due to too high pp gain **({}pp)**.".format(username, userID, s.pp), "cm")
-				else: # Vanilla
-					if s.gameMode == gameModes.STD:
-						if (s.pp >= 500) and used_mods & 1024:
-							userUtils.restrict(userID)
-							userUtils.appendNotes(userID, "[osu!] Restricted due to too high pp gain with FLASHLIGHT ({}pp).".format(s.pp))
-							log.warning("[osu!] **{}** ({}) has been restricted due to too high pp gain with FLASHLIGHT **({}pp)**.".format(username, userID, s.pp), "cm")
-						elif (s.pp >= 700):
-							userUtils.restrict(userID)
-							userUtils.appendNotes(userID, "[osu!] Restricted due to too high pp gain ({}pp).".format(s.pp))
-							log.warning("[osu!] **{}** ({}) has been restricted due to too high pp gain **({}pp)**.".format(username, userID, s.pp), "cm")
-						"""
-					elif (s.pp >= 10000) and s.gameMode == gameModes.TAIKO:
-						userUtils.restrict(userID)
-						userUtils.appendNotes(userID, "[osu!taiko] Restricted due to too high pp gain ({}pp).".format(s.pp))
-						log.warning("[osu!taiko] **{}** ({}) has been restricted due to too high pp gain **({}pp)**.".format(username, userID, s.pp), "cm")
-					elif s.pp >= 10000) and (s.gameMode == gameModes.CTB:
-						userUtils.restrict(userID)
-						userUtils.appendNotes(userID, "[osu!catch] Restricted due to too high pp gain ({}pp).".format(s.pp))
-						log.warning("[osu!catch] **{}** ({}) has been restricted due to too high pp gain **({}pp)**.".format(username, userID, s.pp), "cm")
-						"""
+				if s.gameMode == gameModes.STD:
+					gamemode = 0
+				elif s.gameMode == gameModes.TAIKO:
+					gamemode = 1
+				elif s.gameMode == gameModes.CTB:
+					gamemode = 2
+				elif s.gameMode == gameModes.MANIA:
+					gamemode = 3
+
+				relax = 1 if used_mods & 128 else 0
+				flashlight = 1 if used_mods & 1024 else 0
+
+				pp_limit = scoreUtils.getPPLimit(gamemode, relax, flashlight)
+				unrestricted_user = userUtils.noPPLimit(userID, relax)
+
+				if (s.pp >= pp_limit) and not unrestricted_user:
+					userUtils.restrict(userID)
+					userUtils.appendNotes(userID, "[GM: {gamemode}] Restricted due to too high pp gain{fl} ({pp}pp).".format(gamemode=s.gameMode, fl=' with flashlight' if flashlight else '', pp=s.pp))
+					log.warning("[GM: {gamemode}] **{username}** ({userid}) has been restricted due to too high pp gain{fl} **({pp}pp)**.".format(gamemode=s.gameMode, username=username, userid=userID, fl='with flashlight' if flashlight else '', pp=s.pp), "cm")
 
 				# Make sure the score is not memed
 				if s.gameMode == gameModes.MANIA and s.score > 1000000:
