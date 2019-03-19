@@ -137,6 +137,9 @@ class handler(requestsManager.asyncRequestHandler):
 				log.debug("Beatmap is not submitted/outdated/unknown. Score submission aborted.")
 				return
 
+			if beatmapInfo.beatmapID == 888412 or beatmapInfo.beatmapID == 888413: # fucking readme re-ranking itself smh
+				return
+
 			# increment user playtime
 			length = 0
 			if s.passed:
