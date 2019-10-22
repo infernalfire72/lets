@@ -55,15 +55,15 @@ class handler(requestsManager.asyncRequestHandler):
 			screenshotID = ""
 			while not found:
 				screenshotID = generalUtils.randomString(8)
-				if not os.path.isfile(".data/screenshots/{}.png".format(screenshotID)):
+				if not os.path.isfile("/home/ss/{}.png".format(screenshotID)):
 					found = True
 
 			# Write screenshot file to .data folder
-			with open(".data/screenshots/{}.png".format(screenshotID), "wb") as f:
+			with open("/home/ss/{}.png".format(screenshotID), "wb") as f:
 				f.write(self.request.files["ss"][0]["body"])
 
 			# Add Akatsuki's watermark
-			base_screenshot = Image.open('.data/screenshots/{}.png'.format(screenshotID))
+			base_screenshot = Image.open('/home/ss/{}.png'.format(screenshotID))
 			watermark = Image.open('constants/watermark.png')
 			width, height = base_screenshot.size
 
@@ -73,7 +73,7 @@ class handler(requestsManager.asyncRequestHandler):
 			transparent.paste(base_screenshot, (0,0))
 			transparent.paste(watermark, position, mask=watermark)
 			transparent.show()
-			transparent.save('.data/screenshots/{}.png'.format(screenshotID))
+			transparent.save('/home/ss/{}.png'.format(screenshotID))
 
 			# Output
 			log.info("New screenshot ({})".format(screenshotID))
