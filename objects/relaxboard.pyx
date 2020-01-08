@@ -249,7 +249,7 @@ class scoreboard:
 			# Set personal best score rank
 			self.setPersonalBestRank()	# sets self.personalBestRank with the huge query
 			self.scores[0].rank = self.personalBestRank
-			data += self.scores[0].getData()
+			data += self.scores[0].getData(pp=self.beatmap.rankedStatus != rankedStatuses.LOVED)
 
 		# Output top 50 scores
 		for i in self.scores[1:]:
